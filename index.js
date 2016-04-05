@@ -16,12 +16,19 @@ var proxyServer = http.createServer((req, res) => {
 LOG(`proxy listening on port ${proxyPort}`);
 
 var routes = {};
-
+var ports = {};
 var randomPort = () => 2000 + Math.floor(Math.random() * 1000);
 
 var claimPort = (id, url) => {
-    var port = randomPort();
+    var port;
+
+    //ensure no collisions
+    do port = randomPort();
+    while(ports[port])
+
+    ports[port] = id;
     routes[url] = { id, port };
+
     return port;
 };
 
@@ -54,5 +61,4 @@ var registryServer = http.createServer((req, res) => {
     req.on("data", data => id += data)
        .on("end", () => register(id, req.url, res));
 }).listen(registryPort);
-
 LOG(`registry listening on port ${registryPort}`);
