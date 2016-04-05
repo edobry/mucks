@@ -1,0 +1,10 @@
+{
+  "name": "switchy",
+  "version": "0.0.1",
+  "description": "a reprogrammable http switchboard",
+  "main": "index.js",
+  "author": "Eugene Dobry <eugene@dobry.me>",
+  "dependencies": {
+    "http-proxy": "^1.13.2"
+  }
+}
