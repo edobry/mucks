@@ -33,6 +33,15 @@ var claimPort = (id, url) => {
 };
 
 var register = (id, url, res) => {
+    if(routes[url]) {
+        res.writeHead(409, { "Content-Type": "text/plain" });
+        res.write("url already registered");
+        res.end();
+
+        LOG(`${id} tried to register claimed route ${url}`);
+        return;
+    }
+
     var port = claimPort(id, url);
 
     res.writeHead(200, { "Content-Type": "text/plain" });
