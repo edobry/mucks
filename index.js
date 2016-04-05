@@ -36,19 +36,22 @@ var register = (id, url, res) => {
 };
 
 var handleRouteTable = (req, res) => {
-    if(req.url == "/routes") {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(routes));
-        return;
-    }
-}
+    if(req.url != "/routes")
+        return false;
+
+    LOG("sending route table");
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(routes));
+
+    return true;
+};
 
 var registryPort = 1999;
 var registryServer = http.createServer((req, res) => {
-    handleRouteTable(req, res);
+    if(handleRouteTable(req, res)) return;
 
     var id = "";
-    req.on("data", data => { id += data; })
+    req.on("data", data => id += data)
        .on("end", () => register(id, req.url, res));
 }).listen(registryPort);
 
