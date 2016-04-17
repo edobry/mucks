@@ -1,4 +1,5 @@
 var http = require("http"),
+    parseUrl = require("url").parse,
     httpProxy = require("http-proxy");
 
 var LOG = message => console.log(message);
@@ -6,8 +7,18 @@ var LOG = message => console.log(message);
 var proxyPort = 80;
 var proxy = httpProxy.createProxyServer({});
 
+var splitPath = url => {
+    var path = parseUrl(url).pathname.split('/');
+
+    return {
+        route: path[1],
+        rest: path.slice(2).join('/')
+    };
+};
+
 var proxyServer = http.createServer((req, res) => {
-    var route = routes[req.url];
+    var path = splitPath(req.url);
+    var route = routes[path.route];
 
     if(!route) {
         res.writeHead(404);
@@ -15,7 +26,7 @@ var proxyServer = http.createServer((req, res) => {
         return;
     }
 
-    req.url = "";
+    req.url = path.rest;
 
     LOG(`routing to ${route.id}`);
     proxy.web(req, res, { target: `http://localhost:${route.port}`});
@@ -75,6 +86,6 @@ var registryServer = http.createServer((req, res) => {
 
     var id = "";
     req.on("data", data => id += data)
-       .on("end", () => register(id, req.url, res));
+       .on("end", () => register(id, splitPath(req.url).route, res));
 }).listen(registryPort);
 LOG(`registry listening on port ${registryPort}`);
