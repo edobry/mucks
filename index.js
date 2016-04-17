@@ -8,6 +8,13 @@ var proxy = httpProxy.createProxyServer({});
 
 var proxyServer = http.createServer((req, res) => {
     var route = routes[req.url];
+
+    if(!route) {
+        res.writeHead(404);
+        res.end("unknown route");
+        return;
+    }
+
     req.url = "";
 
     LOG(`routing to ${route.id}`);
