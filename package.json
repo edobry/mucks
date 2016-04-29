@@ -1,13 +1,17 @@
 {
-  "name": "mucks",
-  "version": "0.0.1",
-  "description": "a port multiplexer",
-  "main": "index.js",
-  "author": "Eugene Dobry <eugene@dobry.me>",
-  "dependencies": {
-    "http-proxy": "^1.13.2"
-  },
-  "scripts": {
-      "start": "npm install && node index.js"
-  }
+    "name": "mucks",
+    "version": "0.0.1",
+    "description": "a port multiplexer",
+    "main": "index.js",
+    "author": "Eugene Dobry <eugene@dobry.me>",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/edobry/mucks"
+    },
+    "dependencies": {
+        "http-proxy": "^1.13.2"
+    },
+    "scripts": {
+        "start": "npm install && node index.js"
+    }
 }
