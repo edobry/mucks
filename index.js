@@ -51,7 +51,9 @@ var claimPort = (id, url) => {
 };
 
 var register = (id, url, res) => {
-    if(routes[url]) {
+    var existingRegistration = routes[url];
+    //TODO: implement heartbeat to release registrations on app death
+    if(existingRegistration && existingRegistration.id != id) {
         res.writeHead(409, { "Content-Type": "text/plain" });
         res.write("url already registered");
         res.end();
