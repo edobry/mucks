@@ -27,50 +27,57 @@ module.exports = class Registry {
         this.ports = {};
     }
     start() {
-        this.server = http.createServer((req, res) => {
-            if(handleRouteTable(req, res))
-                return;
-
-            var id = "";
-            req
-                .on("data", data => id += data)
-                .on("end", () =>
-                    this.register(id, util.splitPath(req.url).route, res));
-        }).listen(this.port, () =>
-            LOG(`registry listening on port ${this.port}`));
+        this.server = http.createServer(this.handle.bind(this))
+            .listen(this.port, () =>
+                LOG(`registry listening on port ${this.port}`));
     }
-    register(id, url, res) {
-        const existingRegistration = this.routes[url];
+    handle(req, res) {
+        if(handleRouteTable(req, res))
+            return;
 
-        //TODO: implement heartbeat to release registrations on app death
+        var body = "";
+        req
+            .on("data", data => body += data)
+            .on("end", () =>
+                this.register(JSON.parse(body), util.splitPath(req.url).route, res));
+    }
+    register({ id, port }, route, res) {
+        const existingRegistration = this.routes[route];
+
+        //TODO: implement heartbeat to release registrations on`` app death
         if(existingRegistration && existingRegistration.id != id) {
             res.writeHead(409, util.contentType("text"));
-            res.write("url already registered");
-            res.end();
+            res.end("route already registered");
 
-            LOG(`${id} tried to register claimed route ${url}`);
+            LOG(`${id} tried to register claimed route ${route}`);
             return;
         }
 
-        const port = this.claimPort(id, url);
+        const claimedPort = this.claimPort(res, id, route, port);
 
         res.writeHead(200, util.contentType("text"));
-        res.write(port.toString());
-        res.end();
+        res.end(claimedPort.toString());
 
-        LOG(`registered ${url} to ${id} on port ${port}`);
+        LOG(`registered ${route} to ${id} on port ${claimedPort}`);
     }
-    claimPort(id, url) {
-        var port;
+    claimPort(res, id, url, port) {
+        if(this.ports[port]) {
+            res.writeHead(409, util.contentType("text"));
+            res.end("port already claimed");
 
-        //ensure no collisions
-        do port = randomPort();
-        while(this.ports[port])
+            LOG(`${id} tried to claim occupied port ${port}`);
+            return;
+        }
+
+        if(!port) {
+            //ensure no collisions
+            do port = randomPort();
+            while(this.ports[port])
+        }
 
         this.ports[port] = id;
         this.routes[url] = { id, port };
 
         return port;
     };
-
 };
