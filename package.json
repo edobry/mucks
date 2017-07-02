@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/edobry/mucks"
   },
+  "bin": {
+    "mucks": "./index.js"
+  },
   "dependencies": {
     "http-proxy": "^1.13.2",
     "nconf": "^0.8.4"

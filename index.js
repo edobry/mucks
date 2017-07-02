@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const
     nconf = require("nconf"),
 
