@@ -16,6 +16,12 @@ module.exports = class Proxy {
 
         this.server = http.createServer((req, res) => {
             const path = util.splitPath(req.url);
+
+            if(path.rest.length == "") {
+                path.rest = path.route;
+                path.route = "";
+            }
+
             const route = this.registry.routes[path.route];
 
             if(!route) {
