@@ -14,7 +14,7 @@ nconf.env().argv().defaults({
 const LOG = message => console.log(message);
 
 const registry = new Registry(nconf.get("registryPort"));
-const proxy = new Proxy(nconf.get("proxyPort"), registry);
+const proxy = new Proxy(nconf.get("proxy"), registry);
 
 registry.start();
 proxy.start();

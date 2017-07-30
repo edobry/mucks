@@ -7,12 +7,29 @@ const http = require("http"),
 const LOG = message => console.log(message);
 
 module.exports = class Proxy {
-    constructor(port, registry) {
+    constructor({ port, ssl }, registry) {
         this.port = port;
         this.registry = registry;
+
+        if(ssl) {
+            this.secure = true;
+
+            console.log("reading SSL keys...");
+            this.ssl = {
+                key: fs.readFileSync(ssl.keyPath, "utf8"),
+                cert: fs.readFileSync(ssl.certPath, "utf8")
+            };
+        }
     }
     start() {
-        this.proxy = httpProxy.createProxyServer({});
+        const options = {};
+
+        if(this.secure) {
+            console.log("proxy is using SSL");
+            options.ssl = this.ssl;
+        }
+
+        this.proxy = httpProxy.createProxyServer(options);
 
         this.server = http.createServer((req, res) => {
             const path = util.splitPath(req.url);
@@ -32,11 +49,15 @@ module.exports = class Proxy {
 
             req.url = path.rest;
 
-            LOG(`routing to ${route.id}`);
+            LOG(`routing to ${route.id} on port ${route.port}`);
 
             //TODO: handle unresponsive targets better
             this.proxy.web(req, res, {
-                target: `http://localhost:${route.port}`});
+                target: {
+                    host: "localhost",
+                    port: route.port
+                }
+            });
 
             this.proxy.on("error", e =>
                 console.log(`Proxy error: ${e.message}`));
