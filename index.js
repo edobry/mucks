@@ -7,7 +7,9 @@ const
     Proxy = require("./proxy");
 
 nconf.env().argv().defaults({
-    proxyPort: 80,
+    proxy: {
+        port: 80
+    },
     registryPort: 1999
 });
 
