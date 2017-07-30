@@ -34,8 +34,12 @@ module.exports = class Proxy {
 
             LOG(`routing to ${route.id}`);
 
+            //TODO: handle unresponsive targets better
             this.proxy.web(req, res, {
                 target: `http://localhost:${route.port}`});
+
+            this.proxy.on("error", e =>
+                console.log(`Proxy error: ${e.message}`));
         }).listen(this.port, () =>
             LOG(`proxy listening on port ${this.port}`));
     }
