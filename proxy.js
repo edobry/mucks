@@ -18,8 +18,8 @@ module.exports = class Proxy {
 
             console.log("reading SSL keys...");
             this.ssl = {
-                key: fs.readFileSync(ssl.keyPath, "utf8"),
-                cert: fs.readFileSync(ssl.certPath, "utf8")
+                key: fs.readFileSync(ssl.key, "utf8"),
+                cert: fs.readFileSync(ssl.cert, "utf8")
             };
         }
     }
